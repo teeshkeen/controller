@@ -33,41 +33,16 @@ export class BluetoothManager {
     console.log('BluetoothManager: Протокол:', window.location.protocol)
     console.log('BluetoothManager: Хост:', window.location.hostname)
 
-    // Проверяем доступность Bluetooth API
     if (!navigator.bluetooth) {
       console.error('BluetoothManager: Bluetooth не поддерживается')
       this.error.value = 'Bluetooth не поддерживается в этом браузере'
       return
     }
 
-    // Проверяем, что мы на HTTPS или localhost
     if (window.location.protocol !== 'https:' && window.location.hostname !== 'localhost') {
       console.error('BluetoothManager: Неверный протокол')
       this.error.value = 'Bluetooth доступен только через HTTPS или localhost'
       return
-    }
-
-    // Рекламируем себя как Bluetooth сервер
-    if (navigator.bluetooth.getAvailability) {
-      navigator.bluetooth.getAvailability().then((available) => {
-        if (available) {
-          console.log('BluetoothManager: Рекламируем сервер')
-          navigator.bluetooth
-            .requestLEScan({
-              filters: [],
-              acceptAllAdvertisements: true,
-            })
-            .then((scan) => {
-              console.log('BluetoothManager: Сканирование начато')
-              scan.addEventListener('advertisementreceived', (event) => {
-                console.log('BluetoothManager: Получена реклама от:', event.device.name)
-              })
-            })
-            .catch((error) => {
-              console.error('BluetoothManager: Ошибка сканирования:', error)
-            })
-        }
-      })
     }
 
     console.log('BluetoothManager: Инициализация успешна')
@@ -85,8 +60,7 @@ export class BluetoothManager {
 
       console.log('BluetoothManager: Запрос устройства')
       this.device = await navigator.bluetooth.requestDevice({
-        // @ts-ignore - acceptAllDevices существует в API, но не в типах
-        acceptAllDevices: true,
+        filters: [{ namePrefix: '' }],
         optionalServices: [this.SERVICE_UUID],
       })
       console.log('BluetoothManager: Устройство выбрано')
@@ -109,7 +83,6 @@ export class BluetoothManager {
       this.isConnected.value = true
       console.log('BluetoothManager: Подключение успешно')
 
-      // Подписываемся на отключение
       this.device.addEventListener('gattserverdisconnected', this.onDisconnected)
     } catch (err) {
       console.error('BluetoothManager: Ошибка подключения:', err)

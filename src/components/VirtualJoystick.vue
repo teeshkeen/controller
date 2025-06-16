@@ -2,13 +2,13 @@
   <div
     class="joystick-container"
     :style="{ width: size + 'px', height: size + 'px' }"
-    @mousedown="startDrag"
-    @touchstart="startDrag"
-    @mousemove="onDrag"
-    @touchmove="onDrag"
-    @mouseup="stopDrag"
-    @touchend="stopDrag"
-    @mouseleave="stopDrag"
+    @mousedown.prevent="startDrag"
+    @touchstart.prevent="startDrag"
+    @mousemove.prevent="onDrag"
+    @touchmove.prevent="onDrag"
+    @mouseup.prevent="stopDrag"
+    @touchend.prevent="stopDrag"
+    @mouseleave.prevent="stopDrag"
   >
     <div
       class="joystick-base"
@@ -23,7 +23,7 @@
       :style="{
         width: stickSize + 'px',
         height: stickSize + 'px',
-        transform: `translate(${position.x}px, ${position.y}px)`,
+        transform: `translate(calc(-50% + ${position.x}px), calc(-50% + ${position.y}px))`,
         backgroundColor: stickColor
       }"
     ></div>
@@ -52,8 +52,14 @@ const stickColor = computed(() => props.stickColor || '#42b983')
 const position = ref({ x: 0, y: 0 })
 const isDragging = ref(false)
 const containerRect = ref<DOMRect | null>(null)
+const activeTouchId = ref<number | null>(null)
 
 const startDrag = (event: MouseEvent | TouchEvent) => {
+  if ('touches' in event) {
+    const touch = event.touches[0]
+    activeTouchId.value = touch.identifier
+  }
+  
   isDragging.value = true
   const container = event.currentTarget as HTMLElement
   containerRect.value = container.getBoundingClientRect()
@@ -62,11 +68,24 @@ const startDrag = (event: MouseEvent | TouchEvent) => {
 
 const onDrag = (event: MouseEvent | TouchEvent) => {
   if (!isDragging.value) return
-  updatePosition(event)
+  
+  if ('touches' in event) {
+    const touch = Array.from(event.touches).find(t => t.identifier === activeTouchId.value)
+    if (!touch) return
+    updatePosition(new TouchEvent('touch', { touches: [touch] }))
+  } else {
+    updatePosition(event)
+  }
 }
 
-const stopDrag = () => {
+const stopDrag = (event?: MouseEvent | TouchEvent) => {
+  if (event && 'touches' in event) {
+    const remainingTouches = Array.from(event.touches).filter(t => t.identifier === activeTouchId.value)
+    if (remainingTouches.length > 0) return
+  }
+  
   isDragging.value = false
+  activeTouchId.value = null
   position.value = { x: 0, y: 0 }
   emit('update', 0, 0)
 }
@@ -83,7 +102,6 @@ const updatePosition = (event: MouseEvent | TouchEvent) => {
   let x = clientX - centerX
   let y = clientY - centerY
 
-  // Ограничиваем движение джойстика кругом
   const maxDistance = (size.value - stickSize.value) / 2
   const distance = Math.sqrt(x * x + y * y)
   
@@ -95,14 +113,12 @@ const updatePosition = (event: MouseEvent | TouchEvent) => {
 
   position.value = { x, y }
 
-  // Нормализуем значения от -1 до 1
   const normalizedX = x / maxDistance
   const normalizedY = y / maxDistance
 
   emit('update', normalizedX, normalizedY)
 }
 
-// Очистка при размонтировании
 onUnmounted(() => {
   stopDrag()
 })
@@ -113,6 +129,13 @@ onUnmounted(() => {
   position: relative;
   touch-action: none;
   user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .joystick-base {
@@ -121,6 +144,7 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
+  touch-action: none;
 }
 
 .joystick-stick {
@@ -130,6 +154,15 @@ onUnmounted(() => {
   top: 50%;
   transform: translate(-50%, -50%);
   cursor: grab;
+  transition: transform 0.1s ease-out;
+  touch-action: none;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .joystick-stick:active {

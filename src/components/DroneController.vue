@@ -16,7 +16,6 @@
     <div class="controls">
       <div class="joysticks">
         <div class="joystick-wrapper">
-          <h3>Левый стик</h3>
           <VirtualJoystick
             @update="updateLeftStick"
             base-color="#1976D2"
@@ -24,7 +23,6 @@
           />
         </div>
         <div class="joystick-wrapper">
-          <h3>Правый стик</h3>
           <VirtualJoystick
             @update="updateRightStick"
             base-color="#C2185B"
@@ -139,6 +137,7 @@ onUnmounted(() => {
 
 .status-bar {
   display: flex;
+  justify-content: center;
   align-items: center;
   gap: 20px;
   margin-bottom: 20px;
@@ -161,7 +160,6 @@ onUnmounted(() => {
 }
 
 .joystick-wrapper {
-  flex: 1;
   text-align: center;
 }
 

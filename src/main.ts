@@ -15,7 +15,7 @@ const app = createApp(App)
 app.use(createPinia())
 app.use(router)
 app.use(Quasar, {
-  plugins: {}, // import Quasar plugins and add here
+  plugins: {}
 })
 
 app.mount('#app')
