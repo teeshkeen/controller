@@ -47,6 +47,30 @@ export class BluetoothManager {
       return
     }
 
+    // Рекламируем себя как Bluetooth сервер
+    if (navigator.bluetooth.getAvailability) {
+      navigator.bluetooth.getAvailability().then((available) => {
+        if (available) {
+          console.log('BluetoothManager: Рекламируем сервер')
+          // @ts-ignore - requestLEScan существует в API, но не в типах
+          navigator.bluetooth
+            .requestLEScan({
+              filters: [],
+              acceptAllAdvertisements: true,
+            })
+            .then((scan) => {
+              console.log('BluetoothManager: Сканирование начато')
+              scan.addEventListener('advertisementreceived', (event) => {
+                console.log('BluetoothManager: Получена реклама от:', event.device.name)
+              })
+            })
+            .catch((error) => {
+              console.error('BluetoothManager: Ошибка сканирования:', error)
+            })
+        }
+      })
+    }
+
     console.log('BluetoothManager: Инициализация успешна')
   }
 
