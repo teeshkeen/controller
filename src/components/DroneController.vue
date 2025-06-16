@@ -4,7 +4,6 @@
       <q-btn
         :color="bluetoothManager.isConnected.value ? 'negative' : 'primary'"
         :loading="bluetoothManager.isConnecting.value"
-        :disable="!!bluetoothManager.error"
         @click="toggleConnection"
       >
         {{ bluetoothManager.isConnected.value ? 'Отключиться' : 'Подключиться' }}
@@ -110,13 +109,16 @@ const sendControllerData = async () => {
 
 const toggleConnection = async () => {
   try {
+    console.log('DroneController: Попытка переключения подключения');
     if (bluetoothManager.isConnected.value) {
-      await bluetoothManager.disconnect()
+      console.log('DroneController: Отключение');
+      await bluetoothManager.disconnect();
     } else {
-      await bluetoothManager.connect()
+      console.log('DroneController: Подключение');
+      await bluetoothManager.connect();
     }
   } catch (error) {
-    console.error('Ошибка подключения:', error)
+    console.error('DroneController: Ошибка:', error);
   }
 }
 
