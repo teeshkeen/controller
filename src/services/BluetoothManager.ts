@@ -19,8 +19,8 @@ export class BluetoothManager {
   private server: BluetoothRemoteGATTServer | null = null;
   private characteristic: BluetoothRemoteGATTCharacteristic | null = null;
   
-  public isConnected = ref(false);
-  public isConnecting = ref(false);
+  public isConnected = ref<boolean>(false);
+  public isConnecting = ref<boolean>(false);
   public error = ref<string | null>(null);
 
   private readonly SERVICE_UUID = '0000FFE0-0000-1000-8000-00805F9B34FB';

@@ -3,7 +3,7 @@
     <div class="status-bar">
       <q-btn
         :color="bluetoothManager.isConnected ? 'negative' : 'primary'"
-        :loading="bluetoothManager.isConnecting"
+        :loading="bluetoothManager.isConnecting.value"
         @click="toggleConnection"
       >
         {{ bluetoothManager.isConnected ? 'Отключиться' : 'Подключиться' }}
