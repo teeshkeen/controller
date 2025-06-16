@@ -27,8 +27,26 @@ export class BluetoothManager {
   private readonly CHARACTERISTIC_UUID = '0000FFE1-0000-1000-8000-00805F9B34FB';
   private readonly DEVICE_NAME = 'DroneController';
 
+  constructor() {
+    // Проверяем доступность Bluetooth API
+    if (!navigator.bluetooth) {
+      this.error.value = 'Bluetooth не поддерживается в этом браузере';
+      return;
+    }
+
+    // Проверяем, что мы на HTTPS или localhost
+    if (window.location.protocol !== 'https:' && window.location.hostname !== 'localhost') {
+      this.error.value = 'Bluetooth доступен только через HTTPS или localhost';
+      return;
+    }
+  }
+
   public async connect(): Promise<void> {
     try {
+      if (!navigator.bluetooth) {
+        throw new Error('Bluetooth не поддерживается в этом браузере');
+      }
+
       this.isConnecting.value = true;
       this.error.value = null;
 
@@ -58,13 +76,18 @@ export class BluetoothManager {
   }
 
   public async disconnect(): Promise<void> {
-    if (this.server?.connected) {
-      this.server.disconnect();
+    try {
+      if (this.server?.connected) {
+        this.server.disconnect();
+      }
+      this.device = null;
+      this.server = null;
+      this.characteristic = null;
+      this.isConnected.value = false;
+    } catch (err) {
+      this.error.value = err instanceof Error ? err.message : 'Ошибка при отключении';
+      throw err;
     }
-    this.device = null;
-    this.server = null;
-    this.characteristic = null;
-    this.isConnected.value = false;
   }
 
   private onDisconnected = () => {

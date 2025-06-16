@@ -2,11 +2,12 @@
   <div class="controller-container">
     <div class="status-bar">
       <q-btn
-        :color="bluetoothManager.isConnected ? 'negative' : 'primary'"
+        :color="bluetoothManager.isConnected.value ? 'negative' : 'primary'"
         :loading="bluetoothManager.isConnecting.value"
+        :disable="!!bluetoothManager.error"
         @click="toggleConnection"
       >
-        {{ bluetoothManager.isConnected ? 'Отключиться' : 'Подключиться' }}
+        {{ bluetoothManager.isConnected.value ? 'Отключиться' : 'Подключиться' }}
       </q-btn>
       <div v-if="bluetoothManager.error" class="error-message">
         {{ bluetoothManager.error }}
