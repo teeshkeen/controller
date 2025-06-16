@@ -52,7 +52,6 @@ export class BluetoothManager {
       navigator.bluetooth.getAvailability().then((available) => {
         if (available) {
           console.log('BluetoothManager: Рекламируем сервер')
-          // @ts-ignore - requestLEScan существует в API, но не в типах
           navigator.bluetooth
             .requestLEScan({
               filters: [],
