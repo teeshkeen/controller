@@ -23,8 +23,8 @@ export class BluetoothManager {
   public isConnecting = ref<boolean>(false);
   public error = ref<string | null>(null);
 
-  private readonly SERVICE_UUID = '0000FFE0-0000-1000-8000-00805F9B34FB';
-  private readonly CHARACTERISTIC_UUID = '0000FFE1-0000-1000-8000-00805F9B34FB';
+  private readonly SERVICE_UUID = '0000ffe0-0000-1000-8000-00805f9b34fb';
+  private readonly CHARACTERISTIC_UUID = '0000ffe1-0000-1000-8000-00805f9b34fb';
   private readonly DEVICE_NAME = 'DroneController';
 
   constructor() {
